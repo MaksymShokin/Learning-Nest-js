@@ -1,35 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
 
 type User = {
   id: number;
   name: string;
+  email: string;
   role: 'admin' | 'user' | 'developer';
 };
 
 @Injectable()
 export class UsersService {
   private users: User[] = [
-    { id: 1, name: 'John Doe', role: 'admin' },
-    { id: 2, name: 'Jane Doe', role: 'user' },
-    { id: 3, name: 'John Smith', role: 'developer' },
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'admin' },
+    { id: 2, name: 'Jane Doe', email: 'jane.doe@example.com', role: 'user' },
+    {
+      id: 3,
+      name: 'John Smith',
+      email: 'john.smith@example.com',
+      role: 'developer',
+    },
   ];
 
   getUsers(role?: 'admin' | 'user' | 'developer'): User[] {
     if (role) {
+      if (!['admin', 'user', 'developer'].includes(role)) {
+        throw new BadRequestException('Invalid role');
+      }
       return this.users.filter((user) => user.role === role);
     }
     return this.users;
   }
 
-  getUser(id: number): User | undefined {
-    return this.users.find((user) => user.id === id);
+  getUser(id: number): User {
+    const user = this.users.find((user) => user.id === id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
-  createUser(user: Pick<User, 'name' | 'role'>): User {
+  createUser(createUserDto: CreateUserDto): User {
     const newUserId = this.users.length + 1;
     const newUser: User = {
       id: newUserId,
-      ...user,
+      ...createUserDto,
     };
     this.users.push(newUser);
     return newUser;
