@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ValidationPipe,
 } from '@nestjs/common';
 import { PrismaUsersService } from './prisma-users.service';
 import { Prisma } from 'generated/prisma/client';
@@ -15,7 +16,7 @@ export class PrismaUsersController {
   constructor(private readonly prismaUsersService: PrismaUsersService) {}
 
   @Post()
-  create(@Body() createPrismaUserDto: Prisma.UserCreateInput) {
+  create(@Body(ValidationPipe) createPrismaUserDto: Prisma.UserCreateInput) {
     return this.prismaUsersService.create(createPrismaUserDto);
   }
 
@@ -32,7 +33,7 @@ export class PrismaUsersController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updatePrismaUserDto: Prisma.UserUpdateInput,
+    @Body(ValidationPipe) updatePrismaUserDto: Prisma.UserUpdateInput,
   ) {
     return this.prismaUsersService.update(+id, updatePrismaUserDto);
   }

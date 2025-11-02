@@ -1,7 +1,6 @@
 import { config } from 'dotenv';
 import { defineConfig, env } from 'prisma/config';
 
-// Load .env file before Prisma config is evaluated
 config();
 
 export default defineConfig({
