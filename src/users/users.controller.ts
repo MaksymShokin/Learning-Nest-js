@@ -14,7 +14,9 @@ import { UsersService } from './users.service';
 import type { User, UserRole } from './types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -29,11 +31,13 @@ export class UsersController {
     return this.usersService.getUser(id);
   }
 
+  @SkipThrottle({ default: false })
   @Post()
   createUser(@Body(ValidationPipe) createUserDto: CreateUserDto): User {
     return this.usersService.createUser(createUserDto);
   }
 
+  @Throttle({ short: { limit: 1, ttl: 1000 } })
   @Patch(':id')
   updateUser(
     @Param('id', ParseIntPipe) id: number,
